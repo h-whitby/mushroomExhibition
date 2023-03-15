@@ -33,7 +33,7 @@ After a lot of testing, debugging and adding more and more functionality and vis
 
 
 ## The final result
-The rest of the time since that first test has been spent refining and developing the code, with frequent demos with the Lower Sixth to get their well-needed feedback. With some now quite intricate and thorough design, I'm very pleased with how it has turned out and hope you enjoy the sonic landscape it provides to the exhibition. I've provided as a part of this Github repo all of the code I used along with the necessary libraries to run it. As a part of the testing process I made a simulator that allowed the project work without the hardware so please do go and explore this for yourself. Here's a demo of what it looks and sounds like in action:
+The rest of the time since that first test has been spent refining and developing the code, with frequent demos with the Lower Sixth to get their well-needed feedback. With some now quite intricate and thorough design, I'm very pleased with how it has turned out and hope you enjoy the sonic landscape it provides to the exhibition. I've provided as a part of this Github repo all of the code I used along with the necessary libraries to run it. As a part of the testing process I made a simulator that allowed the project to work without the hardware so please do go and explore this for yourself. Here's a demo of what it looks and sounds like in action:
 
 https://user-images.githubusercontent.com/127994356/225460884-8061f6d6-717a-4c71-b767-53777af571bf.mp4
 
