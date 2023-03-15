@@ -1,0 +1,14 @@
+bass
+bitSynth
+brokenChord
+dreamMachine
+epiano
+glock
+ocarina
+octaves
+rhodes
+stringPad
+synthLead
+tinesPiano
+voice
+whistle
