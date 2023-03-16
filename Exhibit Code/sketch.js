@@ -70,6 +70,9 @@ let waveSize;
 let titleTable = ['Musical Mycology', 'Fungal Frequencies', 'Groove Caps'];
 let titleChoice; 
 let freqTable = [];
+let greenAlpha = 0;
+let yellowAlpha = 0;
+let redAlpha = 0;
 
 
 
@@ -242,10 +245,22 @@ function draw() {
     sensorFreq = calculateFreq();
 
     if (sensorFreq > lowerBand && sensorFreq < middleBand) {
+      greenAlpha += 0.2;
+      if(greenAlpha > 1) {
+        greenAlpha = 1;
+      }
       lowBand();
     } else if (sensorFreq > middleBand && sensorFreq < higherBand) {
+      yellowAlpha += 0.2;
+      if(yellowAlpha > 1) {
+        yellowAlpha = 1;
+      }
       midBand();
     } else if (sensorFreq > higherBand) {
+      redAlpha += 0.2;
+      if(redAlpha > 1) {
+        redAlpha = 1;
+      }
       highBand();
     }
     
@@ -254,6 +269,29 @@ function draw() {
     // sensorFreq = 0;
     
   }
+
+  push();
+  let greenAlphaVal = map(greenAlpha, 0, 1, 0, 255);
+  fill(color(255, 0, 0, greenAlphaVal));
+  noStroke();
+  circle(40, 30, 15);
+  pop();
+
+  push();
+  let yellowAlphaVal = map(yellowAlpha, 0, 1, 0, 255);
+  fill(color(255, 255, 0, yellowAlphaVal));
+  noStroke();
+  circle(60, 30, 15);
+  pop();
+
+  push()
+  let redAlphaVal = map(redAlpha, 0, 1, 0, 255);
+  fill(color(0, 255, 0, redAlphaVal));
+  noStroke();
+  circle(80, 30, 15);
+  pop();
+
+  
 
   text('Sensor Frequency: ' + sensorFreq.toFixed(2), 30, 90);
   
@@ -318,12 +356,47 @@ function draw() {
   if (simulateCheck.checked() && dataIn) {
     sensorFreq = simulateSensor();
     if (sensorFreq > lowerBand && sensorFreq < middleBand) {
+      
+      greenAlpha += 0.2;
+      if(greenAlpha > 1) {
+        greenAlpha = 1;
+      }
+      
       lowBand();
     } else if (sensorFreq > middleBand && sensorFreq < higherBand) {
+      
+      yellowAlpha += 0.2;
+
+      if(yellowAlpha > 1) {
+        yellowAlpha = 1;
+      }
+      
       midBand();
     } else if (sensorFreq > higherBand) {
+      
+      redAlpha += 0.2;
+      if(redAlpha > 1) {
+        redAlpha = 1;
+      }
+      
       highBand();
     }
+  }
+
+  greenAlpha -= 0.05;
+  yellowAlpha -= 0.05;
+  redAlpha -= 0.05;
+
+  if (greenAlpha < 0) {
+    greenAlpha = 0;
+  }
+
+  if (yellowAlpha < 0) {
+    yellowAlpha = 0;
+  }
+
+  if (redAlpha < 0) {
+    redAlpha = 0;
   }
 
   // Sensor Data Graphing
@@ -542,7 +615,7 @@ function highBand() {
 function simulateSensor() {
   perlinX = noise(noiseX);
   noiseX++;
-  return(map(perlinX,0,1,8,18));
+  return(map(perlinX,0,1,8,19));
 }
 
 
