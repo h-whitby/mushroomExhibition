@@ -1,25 +1,16 @@
+const DEBUG_MODE = true;
+
 //initialising elements
 let mushyLoops = [];
 
 let port;
 
-let connectBtn;
-let fadeDroneBtn;
-let randomSampleBtn;
-let sensSlider;
-let audioCheck;
-let lowInput;
-let midInput;
-let highInput;
-let chanceValBtn;
-let simulateCheck;
+let connectBtn, fadeDroneBtn, randomSampleBtn, sensSlider, audioCheck, lowInput, midInput, highInput, chanceValBtn, simulateCheck;
 
-let currentMillis = 0;
-let previousMillis = 0;
+let currentMillis, previousMillis = 0;
 
-let sensorFreq = 0;
 let dataIn = false;
-let noiseX = 0;
+let sensorFreq, noiseX = 0;
 let perlinX;
 
 let droneOscs = [];
@@ -27,29 +18,24 @@ let droneVerb;
 
 let pbRateTable = [0.5, 1, 2];
 
-let samplefftTable = [];
-let dronefftTable = [];
-let reverbTable = [];
-let delayTable = [];
-// let distTable = [];
-let filterTable = [];
+let samplefftTable, dronefftTable, reverbTable, delayTable, filterTable = [];
 
 // variables to change with the project
 //Number of loops in folder and their names
-let mushyLoopsNum;
-let mushyLoopNames;
+let mushyLoopsNum, mushyLoopNames;
+let maxNameWidth = 0;
 
 //polling rate for the arduino
-let refreshRate = 200;
+const REFRESH_RATE = 200;
  
 // frequency needed to enter band and chance for loop to start, these are default values
-let randomChance = 500;
-let lowerBand = 12;
-let lowBandChance = randomChance * 0.9;
-let middleBand = 14;
-let midBandChance = randomChance * 0.5;
-let higherBand = 16;
-let highBandChance = randomChance * 0.2;
+const RANDOM_CHANCE = 500;
+const LOWER_BAND = 12;
+const LOW_BAND_CHANCE = RANDOM_CHANCE * 0.9;
+const MIDDLE_BAND = 14;
+const MID_BAND_CHANCE = RANDOM_CHANCE * 0.5;
+const HIGHER_BAND = 16;
+const HIGH_BAND_CHANCE = RANDOM_CHANCE * 0.2;
 
 let midBandMult = 1.3;
 let highBandMult = 1.5;
@@ -63,25 +49,29 @@ let sampleCols = [];
 
 // Visual elements
 
-let textGap = 140;
-let elemGap;
-let waveSize;
+const TEXT_GAP = 140;
+let elemGap, waveSize, titleChoice; 
 let titleTable = ['Musical Mycology', 'Fungal Frequencies', 'Groove Caps'];
-let titleChoice; 
-
-
-
+let freqTable = [];
+let greenAlpha, yellowAlpha, redAlpha = 0;
 
 
 function preload() {
   // preloads all of the audio
-
   mushyLoopNames = loadStrings('mushyLoops/loopNames.txt', loadSamples);
   
 }
 
+function presetButton(name, position, mousePressEvent) {
+    let button = createButton(name);
+    button.position(position);
+    if (mousePressEvent)
+      button.mousePressed(mousePressEvent);
+    if (!DEBUG_MODE)
+      button.hide();
 
-
+    return button;
+}
 
 function setup() {
   createCanvas(windowWidth - 150, windowHeight - 10);
@@ -101,27 +91,16 @@ function setup() {
 
   // presets all of the buttons in the project window for connecting and controlling sounds
 
-  connectBtn = createButton('Connect to Arduino');
-  connectBtn.position(windowWidth - 70, 0);
-  connectBtn.mousePressed(connectBtnClick);
-
-  fadeDroneBtn = createButton('Fade Drone');
-  fadeDroneBtn.position(windowWidth - 70, 200);
-  fadeDroneBtn.mousePressed(fadeDroneBtnClick);
-
-  randomSampleBtn = createButton('Add random sample');
-  randomSampleBtn.position(windowWidth - 70, 100);
-  randomSampleBtn.mousePressed(randomSampleBtnClick);
+  connectBtn=presetButton('Connect to Arduino', (windowWidth-70,0),connectBtnClick);
+  fadeDroneBtn=presetButton('Fade Drone',(windowWidth-70,0),fadeDroneBtnClick);
+  randomSampleBtn=presetButton('Add random sample',(windowWidth - 70, 100), randomSampleBtnClick);
+  chanceValBtn=presetButton('Input new band multipliers', (30,35), chanceValBtnClick);
 
   audioCheck = createCheckbox('Toggle Audio', false);
   audioCheck.style('font-size', '40px');
   audioCheck.style('color', 'white');
   audioCheck.position(windowWidth * 0.70, 50);
   audioCheck.changed(toggleAudio);
-
-  chanceValBtn = createButton('Input new band multipliers');
-  chanceValBtn.position(30, 35);
-  chanceValBtn.mousePressed(chanceValBtnClick);
 
   simulateCheck = createCheckbox('Simulate Sensor?', false);
   simulateCheck.style('color', 'white');
@@ -171,16 +150,12 @@ function setup() {
     colorMode(RGB);
   }
 
-  elemGap = (height - textGap)/(mushyLoopsNum + droneOscs.length);
+  elemGap = (height - TEXT_GAP)/(mushyLoopsNum + droneOscs.length);
   waveSize = elemGap/2;
 
-  frameRate(refreshRate);
-
+  frameRate(REFRESH_RATE);
   
 }
-
-
-
 
 
 function draw() {
@@ -209,9 +184,9 @@ function draw() {
   // takes slider value, adjusts bands and returns current value
   let sliderVal = sensSlider.value();
 
-  lowerBand = sliderVal;
-  middleBand = sliderVal * midBandMult;
-  higherBand = sliderVal * highBandMult;
+  LOWER_BAND = sliderVal;
+  MIDDLE_BAND = sliderVal * midBandMult;
+  HIGHER_BAND = sliderVal * highBandMult;
 
   textAlign(LEFT);
   textSize(12);
@@ -225,11 +200,11 @@ function draw() {
   if (inByte == 1 && dataIn) {
     sensorFreq = calculateFreq();
 
-    if (sensorFreq > lowerBand && sensorFreq < middleBand) {
+    if (sensorFreq > LOWER_BAND && sensorFreq < MIDDLE_BAND) {
       lowBand();
-    } else if (sensorFreq > middleBand && sensorFreq < higherBand) {
+    } else if (sensorFreq > MIDDLE_BAND && sensorFreq < HIGHER_BAND) {
       midBand();
-    } else if (sensorFreq > higherBand) {
+    } else if (sensorFreq > HIGHER_BAND) {
       highBand();
     }
     
@@ -249,7 +224,7 @@ function draw() {
     noStroke();
     textAlign(LEFT, CENTER);
     textSize(11);
-    text(mushyLoopNames[i] + ': ', 15, (i*elemGap) + textGap);
+    text(mushyLoopNames[i] + ': ', 15, (i*elemGap) + TEXT_GAP);
 
     let waveForm = samplefftTable[i].waveform();
 
@@ -259,7 +234,7 @@ function draw() {
 
     for (let j = 0; j < waveForm.length; j++){
       let x = map(j, 0, waveForm.length, 100, width-20);
-      let y = map(waveForm[j], -1, 1, (i*elemGap) + textGap - waveSize, (i*elemGap) + textGap + waveSize);
+      let y = map(waveForm[j], -1, 1, (i*elemGap) + TEXT_GAP - waveSize, (i*elemGap) + TEXT_GAP + waveSize);
       vertex(x,y);
     }
 
@@ -272,7 +247,7 @@ function draw() {
     noStroke();
     textAlign(LEFT, CENTER);
     textSize(11);
-    text('drone ' + i + ': ', 15, ((int(i) + mushyLoopsNum) * elemGap) + textGap);
+    text('drone ' + i + ': ', 15, ((int(i) + mushyLoopsNum) * elemGap) + TEXT_GAP);
 
     let newWaveform = dronefftTable[i].waveform();
 
@@ -282,7 +257,7 @@ function draw() {
 
     for (let j = 0; j < newWaveform.length; j++){
       let x = map(j, 0, newWaveform.length, 100, width-20);
-      let y = map(newWaveform[j], -1, 1, ((int(i) + mushyLoopsNum) * elemGap) + textGap - waveSize, ((int(i) + mushyLoopsNum) * elemGap) + textGap + waveSize) ;
+      let y = map(newWaveform[j], -1, 1, ((int(i) + mushyLoopsNum) * elemGap) + TEXT_GAP - waveSize, ((int(i) + mushyLoopsNum) * elemGap) + TEXT_GAP + waveSize) ;
       vertex(x,y);
     }
 
@@ -291,11 +266,11 @@ function draw() {
 
   if (simulateCheck.checked() && dataIn) {
     sensorFreq = simulateSensor();
-    if (sensorFreq > lowerBand && sensorFreq < middleBand) {
+    if (sensorFreq > LOWER_BAND && sensorFreq < MIDDLE_BAND) {
       lowBand();
-    } else if (sensorFreq > middleBand && sensorFreq < higherBand) {
+    } else if (sensorFreq > MIDDLE_BAND && sensorFreq < HIGHER_BAND) {
       midBand();
-    } else if (sensorFreq > higherBand) {
+    } else if (sensorFreq > HIGHER_BAND) {
       highBand();
     }
   }
@@ -355,26 +330,25 @@ function toggleAudio() {
     userStartAudio();
     port.open('Arduino', 9600);
     dataIn = true;
-    fadeDroneBtnClick();
   } else {
     dataIn = false;
-    fadeDroneBtnClick();
   }
+  fadeDroneBtnClick();
   
 }
 
 function chanceValBtnClick() {
-  // lowBandChance = float(lowInput.value()) * randomChance;
-  // midBandChance = float(midInput.value()) * randomChance;
-  // highBandChance = float(highInput.value()) * randomChance;
+  // LOW_BAND_CHANCE = float(lowInput.value()) * RANDOM_CHANCE;
+  // MID_BAND_CHANCE = float(midInput.value()) * RANDOM_CHANCE;
+  // HIGH_BAND_CHANCE = float(highInput.value()) * RANDOM_CHANCE;
 
-  midBandMult = float(lowInput.value()) * randomChance;
-  highBandMult = float(midInput.value()) * randomChance;
+  midBandMult = float(lowInput.value()) * RANDOM_CHANCE;
+  highBandMult = float(midInput.value()) * RANDOM_CHANCE;
   
 
-  console.log(lowBandChance);
-  console.log(midBandChance);
-  console.log(highBandChance);
+  console.log(LOW_BAND_CHANCE);
+  console.log(MID_BAND_CHANCE);
+  console.log(HIGH_BAND_CHANCE);
 }
 
 
@@ -448,9 +422,9 @@ function calculateFreq() {
 
 
 function lowBand() {
-  let chanceOfLoop = random(randomChance);
+  let chanceOfLoop = random(RANDOM_CHANCE);
   
-  if (chanceOfLoop > lowBandChance) {
+  if (chanceOfLoop > LOW_BAND_CHANCE) {
     let loopNum = floor(random(mushyLoopsNum));
     if (mushyLoops[loopNum].isPlaying() == false){
       let randAmp = random(0.1,0.3);
@@ -469,9 +443,9 @@ function lowBand() {
 }
 
 function midBand() {
-  let chanceOfLoop = random(randomChance);
+  let chanceOfLoop = random(RANDOM_CHANCE);
   
-  if (chanceOfLoop > midBandChance) {
+  if (chanceOfLoop > MID_BAND_CHANCE) {
     let loopNum = floor(random(mushyLoopsNum));
     if (mushyLoops[loopNum].isPlaying() == false){
       let randAmp = random(0.3, 0.6);
@@ -489,9 +463,9 @@ function midBand() {
 }
 
 function highBand() {
-  let chanceOfLoop = random(randomChance);
+  let chanceOfLoop = random(RANDOM_CHANCE);
   
-  if (chanceOfLoop > highBandChance) {
+  if (chanceOfLoop > HIGH_BAND_CHANCE) {
     let loopNum = floor(random(mushyLoopsNum));
     if (mushyLoops[loopNum].isPlaying() == false){
       let randAmp = random(0.6, 1);
