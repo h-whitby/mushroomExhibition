@@ -27,6 +27,8 @@ let maxNameWidth = 0;
 
 //polling rate for the arduino
 const REFRESH_RATE = 200;
+
+const OSCILLATOR_MAGIC_NUM = 4
  
 // frequency needed to enter band and chance for loop to start, these are default values
 const RANDOM_CHANCE = 500;
@@ -90,12 +92,12 @@ function setup() {
   }
 
   // presets all of the buttons in the project window for connecting and controlling sounds
-
   connectBtn=presetButton('Connect to Arduino', (windowWidth-70,0),connectBtnClick);
   fadeDroneBtn=presetButton('Fade Drone',(windowWidth-70,0),fadeDroneBtnClick);
   randomSampleBtn=presetButton('Add random sample',(windowWidth - 70, 100), randomSampleBtnClick);
   chanceValBtn=presetButton('Input new band multipliers', (30,35), chanceValBtnClick);
 
+  // creates checkboxes
   audioCheck = createCheckbox('Toggle Audio', false);
   audioCheck.style('font-size', '40px');
   audioCheck.style('color', 'white');
@@ -107,7 +109,6 @@ function setup() {
   simulateCheck.position(250, 60);
 
   // initiliases the inputs for the random chance values for each band
-
   lowInput = createInput(midBandMult);
   lowInput.position(30, 10);
   lowInput.size(20);
@@ -116,12 +117,7 @@ function setup() {
   midInput.position(60, 10);
   midInput.size(20);
 
-  // highInput = createInput('0.2');
-  // highInput.position(90, 10);
-  // highInput.size(20);
-
   // initliases the slider controlling sensitivity of the bands
-
   sensSlider = createSlider(0, 40, 11);
   sensSlider.position(150, 60);
   sensSlider.style('width', '80px');
@@ -131,7 +127,7 @@ function setup() {
   droneVerb.drywet(1);
 
   //oscillator drones
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < OSCILLATOR_MAGIC_NUM; i++) {
     droneOscs[i] = new p5.Oscillator('sine');
     droneOscs[i].freq(midiToFreq(34) * (i+1));
     droneOscs[i].disconnect();
