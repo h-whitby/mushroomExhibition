@@ -1,4 +1,30 @@
+// Debug mode
 const DEBUG_MODE = true;
+
+// Colour schemes
+const BACKGROUND_COL = 0;
+const TEXT_COL = 255;
+const TITLE_ALPHA = 0;
+const SUBTITLE_ALPHA = 0;
+
+// Visual elements
+const TEXT_GAP = 140;
+
+// frequency needed to enter band and chance for loop to start, these are default values
+const RANDOM_CHANCE = 500;
+const LOWER_BAND = 12;
+const LOW_BAND_CHANCE = RANDOM_CHANCE * 0.9;
+const MIDDLE_BAND = 14;
+const MID_BAND_CHANCE = RANDOM_CHANCE * 0.5;
+const HIGHER_BAND = 16;
+
+//polling rate for the arduino
+const REFRESH_RATE = 200;
+
+const OSCILLATOR_MAGIC_NUM = 4
+ 
+const HIGH_BAND_CHANCE = RANDOM_CHANCE * 0.2;
+
 
 //initialising elements
 let mushyLoops = [];
@@ -25,33 +51,14 @@ let samplefftTable, dronefftTable, reverbTable, delayTable, filterTable = [];
 let mushyLoopsNum, mushyLoopNames;
 let maxNameWidth = 0;
 
-//polling rate for the arduino
-const REFRESH_RATE = 200;
-
-const OSCILLATOR_MAGIC_NUM = 4
- 
-// frequency needed to enter band and chance for loop to start, these are default values
-const RANDOM_CHANCE = 500;
-const LOWER_BAND = 12;
-const LOW_BAND_CHANCE = RANDOM_CHANCE * 0.9;
-const MIDDLE_BAND = 14;
-const MID_BAND_CHANCE = RANDOM_CHANCE * 0.5;
-const HIGHER_BAND = 16;
-const HIGH_BAND_CHANCE = RANDOM_CHANCE * 0.2;
 
 let midBandMult = 1.3;
 let highBandMult = 1.5;
 
 //Colour schemes
-let backgroundCol = 0;
-let textCol = 255;
-let titleAlpha = 0;
-let subtitleAlpha = 0;
 let sampleCols = [];
 
 // Visual elements
-
-const TEXT_GAP = 140;
 let elemGap, waveSize, titleChoice; 
 let titleTable = ['Musical Mycology', 'Fungal Frequencies', 'Groove Caps'];
 let freqTable = [];
@@ -77,7 +84,7 @@ function presetButton(name, position, mousePressEvent) {
 
 function setup() {
   createCanvas(windowWidth - 150, windowHeight - 10);
-  background(backgroundCol);
+  background(BACKGROUND_COL);
 
   titleChoice = floor(random(titleTable.length));
 
@@ -155,26 +162,26 @@ function setup() {
 
 
 function draw() {
-  background(backgroundCol);
+  background(BACKGROUND_COL);
   
   //Title
-  fill(textCol);
+  fill(TEXT_COL);
   noStroke();
 
   push();
-  fill(255, 255, 255, titleAlpha);
+  fill(255, 255, 255, TITLE_ALPHA);
   textSize(22);
   textStyle(BOLDITALIC);
   textAlign(CENTER);
   text(titleTable[titleChoice], width/2, 50);
-  titleAlpha++;
+  TITLE_ALPHA++;
 
-  fill(200, 200, 200, subtitleAlpha);
+  fill(200, 200, 200, SUBTITLE_ALPHA);
   textStyle(ITALIC);
   textSize(18);
   rectMode(CENTER);
   text('A musical exhibition in collaboration with Diana Puntar and the students of Eltham College', width/2, 90, 500, 100);
-  subtitleAlpha += 0.5;
+  SUBTITLE_ALPHA += 0.5;
   pop();
 
   // takes slider value, adjusts bands and returns current value
@@ -239,7 +246,7 @@ function draw() {
 
   //waveforms of drones
   for (let i in dronefftTable) {
-    fill(textCol);
+    fill(TEXT_COL);
     noStroke();
     textAlign(LEFT, CENTER);
     textSize(11);
