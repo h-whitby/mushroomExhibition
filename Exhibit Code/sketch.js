@@ -3,16 +3,16 @@ let mushyLoops = [];
 
 let port;
 
-let connectBtn;
-let fadeDroneBtn;
-let randomSampleBtn;
-let sensSlider;
-let audioCheck;
-let lowInput;
-let midInput;
-let highInput;
-let chanceValBtn;
-let simulateCheck;
+const connectBtn;
+const fadeDroneBtn;
+const randomSampleBtn;
+const sensSlider;
+const audioCheck;
+const lowInput;
+const midInput;
+const highInput;
+const chanceValBtn;
+const simulateCheck;
 
 let currentMillis = 0;
 let previousMillis = 0;
